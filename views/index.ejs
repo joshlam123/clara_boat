@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Game</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Clara's Boat Party</h1>
+    </div>
+
+    <!-- Tabs navigation -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('team')">Team</div>
+        <div class="tab active" onclick="switchTab('check_card')">Check Your Cards</div>
+        <div class="tab" onclick="switchTab('leaderboard')">Leaderboard</div>
+        <div class="tab" onclick="switchTab('icebreaker')">Ice Breaker Rules</div>
+        <div class="tab" onclick="switchTab('karaoke')">Karaoke</div>
+    </div>
+
+    <div class="gif-container">
+        <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2VrajJ3M3hlc2dkamRueXZzOHQwd2hwamZ5ZnV1NHdsMXJoNnBkdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0Iy8G3PwyahZST2E/giphy.gif" alt="Loading GIF">
+    </div>
+
+    <div id="team" class="content tab-content active">
+        <!-- Sign-Up Form below the header -->
+        <div class="signup">
+            <form action="/signup" method="POST">
+                <input type="text" name="name" placeholder="Enter your name" required <%= isLimitReached ? 'disabled' : '' %>>
+                <button type="submit" <%= isLimitReached ? 'disabled' : '' %>>Sign Up</button>
+            </form>
+        </div>
+        
+        <!-- Team section on the left -->
+        <div class="teams">
+            <% teams.forEach(team => { %>
+                <div class="team_page">
+                    <h3><%= team.name %></h3>
+                    <h3>(Leader: <%= team.leader %>)</h3>
+                        <% if (team.leader === 'Isaac') { %>
+                            Bonk <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-bonk-usd.inline.svg&w=1920&q=75" alt="Bonk" />
+                        <% } else if (team.leader === 'Giles') { %>
+                            Joker <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-boden-usd.inline.svg&w=1920&q=75" alt="Joker" />
+                        <% } else if (team.leader === 'Yee Ting') { %>
+                            Pudgy <img src="https://www.pyth.network/_next/image?url=/icons/price-feed-icons/light/crypto-pengu-usd.inline.svg&w=1920&q=75" alt="Pudgy" />
+                        <% } %>
+                    <div class="members">
+                        <% team.members.forEach(member => { %>
+                            <div class="member">
+                                <div class="member-info">
+                                    <h4><%= member.name %></h4>
+                                    <span class="card-suit"><%= member.card %></span>
+                                    <% if (member.card === '9') { %>
+                                        <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-alpaca-usd.inline.svg&w=1920&q=75" alt="9" />
+                                    <% } else if (member.card.startsWith('Ace')) { %>
+                                        <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fequity-us-aapl-usd.inline.svg&w=1920&q=75" alt="Ace" />
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+    </div>
+
+    <div id="check_card" class="leaderboard tab-content">
+        <h2>Cards Picked</h2>
+        <div class="users">
+            <% users.forEach(user => { %>
+                <div class="user">
+                    <div class="member-info">
+                        <h3><%= user.name %> <span class="card-suit"><%= user.card %></h3>
+                            <% if (user.card === '9') { %>
+                                <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-alpaca-usd.inline.svg&w=1920&q=75" alt="9" />
+                            <% } else if (user.card.startsWith('Ace')) { %>
+                                <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fequity-us-aapl-usd.inline.svg&w=1920&q=75" alt="Ace" />
+                            <% } %>
+                            <button type="button" class="edit-button" id="edit-button-<%= user.name %>" onclick="toggleEditForm('<%= user.name %>')">Edit</button>
+                                <!-- Edit Name Form (hidden by default) -->
+                                <div class="edit-name-container" id="edit-container-<%= user.name %>">
+                                    <form action="/edit-name" method="POST">
+                                        <input type="hidden" name="oldName" value="<%= user.name %>">
+                                        <input type="text" name="newName" placeholder="New name" required>
+                                        <button class="button" type="submit" onclick="hideEditForm('<%= user.name %>')">Submit</button>
+                                        <button class="button" type="button" onclick="cancelEditForm('<%= user.name %>')">Cancel</button>
+                                    </form>
+                                </div>
+                        </p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <div id="leaderboard" class="tab-content">
+        <h2>Scoreboard</h2>
+        <% teams.forEach(team => { %>
+            <div class="team_page">
+                <h3><%= team.name %></h3>
+                <h3>Leader: <%= team.leader %></h3>
+                    <% if (team.leader === 'Isaac') { %>
+                        Bonk <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-bonk-usd.inline.svg&w=1920&q=75" alt="Bonk" />
+                    <% } else if (team.leader === 'Giles') { %>
+                        Joker <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-boden-usd.inline.svg&w=1920&q=75" alt="Joker" />
+                    <% } else if (team.leader === 'Yee Ting') { %>
+                        Pudgy <img src="https://www.pyth.network/_next/image?url=/icons/price-feed-icons/light/crypto-pengu-usd.inline.svg&w=1920&q=75" alt="Pudgy" />
+                    <% } %>
+                <div class="score">
+                    <h3 id="score-<%= team.name %>"><%= team.score %></h3>
+                </div>
+                <form action="/edit-score" method="POST" onsubmit="return updateScore(event, '<%= team.name %>')">
+                    <input type="hidden" name="teamName" value="<%= team.name %>">
+                    <input type="hidden" name="add_score" value="1">
+                    <button type="submit">+1</button>
+                </form>
+            </div>
+        <% }) %>
+    </div>  
+
+    <div id="icebreaker" class="tab-content">
+        <h2>Ice Breaker Rules</h2>
+        <div class="card-container">
+            <!-- Card 1: Pudgy rule -->
+            <div class="card" onclick="toggleCard(this)">
+                    <div class="card-front">
+                        <span class="card-number">Pudgy <img src="https://www.pyth.network/_next/image?url=/icons/price-feed-icons/light/crypto-pengu-usd.inline.svg&w=1920&q=75" alt="Pudgy" /></span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">Pudgy <img src="https://www.pyth.network/_next/image?url=/icons/price-feed-icons/light/crypto-pengu-usd.inline.svg&w=1920&q=75" alt="Pudgy" /></span>
+                        <p>Every time your team is picked, make Clara drink, and host will also drink.</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">Bonk  
+                            <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-bonk-usd.inline.svg&w=1920&q=75" alt="Bonk" /></span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">Bonk  
+                            <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-bonk-usd.inline.svg&w=1920&q=75" alt="Bonk" /></span>
+                        <p>Every time your team is picked, make Guox drink, and host will also drink.</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                    <div class="card-front">
+                        <span class="card-number">Joker <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-boden-usd.inline.svg&w=1920&q=75" alt="Joker" /></span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">Joker <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fcrypto-boden-usd.inline.svg&w=1920&q=75" alt="Joker" /></span>
+                        <p>Every time your team is picked, make Guox drink, and host will also drink.</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                    <div class="card-front">
+                        <span class="card-number">Ace <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fequity-us-aapl-usd.inline.svg&w=1920&q=75" alt="Ace" /></span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">Ace <img src="https://www.pyth.network/_next/image?url=%2Ficons%2Fprice-feed-icons%2Flight%2Fequity-us-aapl-usd.inline.svg&w=1920&q=75" alt="Ace" /></span>
+                        <p>Pick one person on your team to take a shot. Pick another team, everybody on the other team cannot stop drinking until either you finish stop drinking. 
+                        </p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                    <div class="card-front">
+                        <span class="card-number">2 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">2 </span>
+                        <p>Choose someone from your own team to drink. Guox gets to make Clara drink if he wants to.</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">3 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">3 </span>
+                        <p>Person with the biggest card from the team of your picking to drink. Clara gets to make guox if she wants to.</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">4 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">4 </span>
+                        <p>First person to grab their cup gets to pick someone from your team to drink.</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">5 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">5 </span>
+                        <p>All people not in your team who identify as guys drink (+ all bi). Guox will not drink, Clara will drink. (host included)</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">6 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">6 </span>
+                        <p>All people not in your team who identify as girls drink (+ all bi). clara will not drink, guox will drink. 
+                        </p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">7 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">7 </span>
+                        <p>Everybody in your team must point at somebody you never met before and just made friends with (cannot point at me), Last one to point must drink. if you point at Guox and Clara, you must drink
+                        </p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">8 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">8 </span>
+                        <p>Choose someone to drink with you (any team)</p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">9 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">9 </span>
+                        <p>Everytime you have to drink, free pass to skip anybody in your team. However clara and guox takes a shot.
+                        </p>
+                    </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                    <div class="card-front">
+                        <span class="card-number">10 </span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-number">10 </span>
+                        <p>Your whole team must drink 10 shots whenever you have to drink
+                        </p>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="karaoke" class="tab-content">
+        <h2>Karaoke Game Rules</h2>
+
+        <!-- Instructional Box -->
+        <div class="karaoke-instructions">
+            <ul>
+                <li><strong>Guess the Song:</strong> <br>We will play a random 15 seconds of a song. <br>Anyone from any team can guess if it's from Guox's or Clara's playlist. <span><br>If you guess wrong, the effect of the card you got from Indian Poker will apply.</span></li>
+                <li><strong>Negating the Card Effect:</strong> <br>If you want to negate the effects of your card, you have to sing the song for 20 seconds.</li>
+                <li><strong>Skipping the Song:</strong> <br>If no one guesses after 3 tries, we will skip the song. <br>After 2 skips, all even-numbered players will drink. <br>After 3 skips, all odd-numbered players will drink. <span><br>If there are more than 3 skips, the skip counter resets to 0.</span></li>
+                <li><strong>Backing Out of Guess:</strong> <br>If you volunteer to guess but back out, you must sing the song in the opposite gender's voice for 20 seconds, or else take a shot.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // Function to switch between tabs
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const allTabs = document.querySelectorAll('.tab-content');
+            const allTabButtons = document.querySelectorAll('.tab');
+
+            allTabs.forEach(tab => tab.classList.remove('active')); // Remove active class from all tabs
+            allTabButtons.forEach(button => button.classList.remove('active')); // Remove active class from all buttons
+
+            // Show the clicked tab's content
+            document.getElementById(tabName).classList.add('active');
+            
+            const activeButton = Array.from(allTabButtons).find(button => 
+                button.textContent.trim().toLowerCase() === tabName.toLowerCase()
+            );
+
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+
+        // Function to toggle the visibility of the name editing form
+        function toggleEditForm(userName) {
+            // Hide the edit button
+            document.getElementById(`edit-button-${userName}`).style.display = 'none';
+            const formContainer = document.getElementById(`edit-container-${userName}`);
+            formContainer.style.display = formContainer.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Function to hide the edit form after submitting
+        function hideEditForm(userName) {
+            const formContainer = document.getElementById(`edit-container-${userName}`);
+            formContainer.style.display = 'none';  // Hide the form after submission
+
+            // Show the edit button again
+            document.getElementById(`edit-button-${userName}`).style.display = 'inline-block';
+        }
+
+        // Function to cancel the edit and hide the form
+        function cancelEditForm(userName) {
+            const formContainer = document.getElementById(`edit-container-${userName}`);
+            formContainer.style.display = 'none';  // Hide the form
+
+            // Show the edit button again
+            document.getElementById(`edit-button-${userName}`).style.display = 'inline-block';
+        }
+
+        // Function to toggle the card details (flip effect)
+        function toggleCard(cardElement) {
+            // Toggle the 'revealed' class to show the card's back content
+            cardElement.classList.toggle('revealed');
+        }
+
+        // Function to update the score without reloading the page
+        function updateScore(event, teamName) {
+            event.preventDefault(); // Prevent form submission to server
+
+            // Get the score element and parse the current score
+            const scoreElement = document.getElementById(`score-${teamName}`);
+            let currentScore = parseInt(scoreElement.textContent);
+
+            // Increment the score by 1
+            currentScore += 1;
+
+            // Update the score in the DOM
+            scoreElement.textContent = currentScore;
+
+            // Now submit the form to the backend
+            const form = event.target;
+            fetch(form.action, {
+                method: 'POST',
+                body: new URLSearchParams(new FormData(form)),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Handle any error on the backend side
+                    alert('Failed to update the score. Please try again!');
+                }
+            })
+            .catch(err => {
+                console.error('Error updating score:', err);
+            });
+
+            return false; // Prevent normal form submission
+        }
+    </script>
+</body>
+</html>
