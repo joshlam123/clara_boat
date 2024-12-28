@@ -1,0 +1,8 @@
+
+tasks:
+  - name: "init scoreboard env"
+    init: |
+      nvm install v23.3.0
+      git checkout $(git describe --tags --abbrev=0)
+      npm install
+    command: npm start
